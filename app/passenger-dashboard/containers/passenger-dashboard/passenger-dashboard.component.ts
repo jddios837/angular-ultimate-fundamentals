@@ -3,6 +3,8 @@ import { Component, OnInit } from "@angular/core";
 import { Passenger } from "../../models/passenger.interface";
 import { PassengerDashboardService } from "../../passenger-dashboard.service";
 
+import { Router } from "@angular/router";
+
 @Component({
 	selector: 'passenger-dashboard',
 	styleUrls: ['passenger-dashboard.component.scss'],
@@ -17,6 +19,7 @@ import { PassengerDashboardService } from "../../passenger-dashboard.service";
 			<passenger-detail
 				*ngFor="let passenger of passengers"
 				[detail]="passenger"
+				(view)="handleView($event)"
 				(edit)="handleEdit($event)"
 				(remove)="handleRemove($event)">
 			</passenger-detail>
@@ -26,28 +29,49 @@ import { PassengerDashboardService } from "../../passenger-dashboard.service";
 export class PassengerDashboardComponent implements OnInit {
 	passengers: Passenger[];
 
-	constructor(private passengerService: PassengerDashboardService) {};
+	constructor(
+		private router: Router,
+		private passengerService: PassengerDashboardService
+		) {};
 
 	ngOnInit() {
 		console.log('ngOnInit');
-		this.passengers = this.passengerService.getPassengers();	
+		this.passengerService
+			.getPassengers()
+			.subscribe((data: Passenger[]) => {
+				this.passengers = data;
+			});	
 	}
 	
 	handleEdit(event: Passenger) {
-		this.passengers = this.passengers.map((passenger: Passenger) => {
-			if (passenger.id === event.id) {
-				passenger = Object.assign({}, passenger, event);
-			}
-			
-			return passenger;
-		});
+		this.passengerService
+			.updatePassenger(event)
+			.subscribe((data: Passenger) => {
+				this.passengers = this.passengers.map((passenger: Passenger) => {
+					if (passenger.id === event.id) {
+						passenger = Object.assign({}, passenger, event);
+					}
+					
+					return passenger;
+				});  
+			})
+
+		
 
 		console.log(this.passengers);
 	}
 
 	handleRemove(event: Passenger) {
-		this.passengers = this.passengers.filter((passenger: Passenger) => {
-			return passenger.id !== event.id;
-		})
+		this.passengerService
+			.deletePassenger(event)
+			.subscribe((data: Passenger) => {
+				this.passengers = this.passengers.filter((passenger: Passenger) => {
+					return passenger.id !== event.id;
+				})
+			})
+	}
+
+	handleView(event: Passenger) {
+		this.router.navigate(['/passengers', event.id]);
 	}
 }

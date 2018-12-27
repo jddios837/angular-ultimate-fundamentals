@@ -1,1 +1,18 @@
-{}
+{
+  "passengers": [
+    {
+      "fullname": "Juan Steven",
+      "id": 1,
+      "checkedIn": true,
+      "baggage": "none",
+      "checkInDate": null
+    },
+    {
+      "id": 2,
+      "fullname": "Juan de Dios",
+      "checkedIn": false,
+      "checkInDate": 1491606000000,
+      "baggage": ""
+    }
+  ]
+}
